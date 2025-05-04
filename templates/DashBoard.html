@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Dashboard</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.8/fullcalendar.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.8/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.8/index.global.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #5a3d66;
+            --primary-light: #8868a1;
+            --secondary: #d3694c;
+            --secondary-light: #e39174;
+            --tertiary: #6b9a53;
+            --tertiary-light: #89ba74;
+            --text-dark: #333333;
+            --text-mid: #5f5f5f;
+            --text-light: #ffffff;
+            --bg-light: #f6f4f7;
+            --bg-white: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e0dae3;
+            --shadow: 0 4px 12px rgba(90, 61, 102, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation */
+        .top-header {
+            background-color: var(--primary);
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .logo i {
+            font-size: 1.75rem;
+        }
+
+        .user-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-nav .notification {
+            position: relative;
+        }
+
+        .user-nav .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-nav .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Main Navigation */
+        .main-nav {
+            background-color: var(--bg-white);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .menu {
+            display: flex;
+            list-style: none;
+            position: relative;
+        }
+
+        .menu > li {
+            position: relative;
+        }
+
+        .menu > li > a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem;
+            color: var(--text-mid);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .menu > li > a:hover, 
+        .menu > li > a.active {
+            color: var(--primary);
+            background-color: rgba(90, 61, 102, 0.05);
+        }
+
+        .menu > li > a > i.fa-chevron-down {
+            font-size: 0.75rem;
+            margin-left: 0.25rem;
+        }
+
+        .submenu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: var(--shadow);
+            border-radius: 0.25rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            padding: 0.5rem 0;
+            list-style: none;
+        }
+
+        .menu > li:hover .submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .submenu li a {
+            display: block;
+            padding: 0.75rem 1.25rem;
+            color: var(--text-mid);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .submenu li a:hover {
+            background-color: rgba(90, 61, 102, 0.05);
+            color: var(--primary);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-container {
+            padding: 1rem 2rem;
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb {
+            font-size: 0.875rem;
+            color: var(--text-mid);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 1.5rem 2rem 2rem;
+            min-height: 600px;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-mid);
+            font-weight: 500;
+        }
+
+        .stat-card .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background-color: var(--primary);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background-color: var(--secondary);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background-color: var(--tertiary);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background-color: #916a4b;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .stat-card .stat-change.positive {
+            color: var(--tertiary);
+        }
+
+        .stat-card .stat-change.negative {
+            color: var(--secondary);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-icon {
+            background-color: transparent;
+            color: var(--text-mid);
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            background-color: rgba(90, 61, 102, 0.1);
+            color: var(--primary);
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-range {
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Claims Summary */
+        .claims-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .claim-item {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background-color: rgba(90, 61, 102, 0.05);
+            border-radius: 0.25rem;
+        }
+
+        .claim-label {
+            font-size: 0.875rem;
+            color: var(--text-mid);
+            margin-bottom: 0.5rem;
+        }
+
+        .claim-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            margin-bottom: 2.5rem;
+            overflow: auto;
+        }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2.5rem;
+        }
+
+        /* Calendar */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #calendar {
+            height: 450px;
+            margin-top: 2rem;
+            overflow: visible;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: rgba(90, 61, 102, 0.05);
+            font-weight: 500;
+        }
+
+        .data-table th.sortable {
+            cursor: pointer;
+        }
+
+        .data-table th.sortable i {
+            margin-left: 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        .data-table tr:hover {
+            background-color: rgba(90, 61, 102, 0.02);
+        }
+
+        .data-table .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-mid);
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0 0;
+            font-size: 0.875rem;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+/* Add these styles to your CSS file */
+
+/* User section styles */
+#user-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Login button styles */
+.login-btn {
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.login-btn i {
+    margin-right: 8px;
+}
+
+.login-btn:hover {
+    background-color: #357ae8;
+}
+
+/* Avatar styles */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Dropdown menu styles */
+.dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    z-index: 1000;
+}
+
+.user-info {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.user-info #user-name {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.user-info #user-email {
+    display: block;
+    font-size: 12px;
+    color: #666;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #eaeaea;
+    margin: 4px 0;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 16px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f5f5f5;
+}
+
+#logout-button {
+    color: #f44336;
+}
+        .btn-sm:hover:not([disabled]) {
+            background-color: var(--primary-light);
+            color: white;
+            border-color: var(--primary-light);
+        }
+
+        .btn-sm[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .menu > li > a {
+                padding: 0.75rem 1rem;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .claims-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-overview,
+            .claims-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .card-actions {
+                align-self: flex-end;
+            }
+        }
+
+        /* Payments By Payer and Caregiver Schedule sections */
+        .two-column .card {
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .two-column .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Make sure the chart in the first column doesn't overflow */
+        .two-column .card:first-child .chart-container {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>HealthCare Hub</span>
+            </div>
+            <div class="user-nav">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="notification">
+                    <i class="fas fa-envelope"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+                <div id="user-section">
+                    <!-- Login button will show when user is not logged in -->
+                    <button id="login-button" class="login-btn" style="display: none;">
+                        <i class="fab fa-google"></i> Login with Google
+                    </button>
+                    
+                    <!-- User avatar and dropdown will show when logged in -->
+                    <div id="user-profile" style="display: none;">
+                        <div class="avatar" id="avatar-container">
+                            <img id="user-avatar" src="/static/default-profile.png" alt="User Avatar">
+                        </div>
+                        <div class="dropdown-menu" id="user-dropdown" style="display: none;">
+                            <div class="user-info">
+                                <span id="user-name">User Name</span>
+                                <span id="user-email">user@example.com</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="/dashboard">Dashboard</a>
+                            <a href="/profile">Profile</a>
+                            <a href="#" id="logout-button">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Navigation -->
+        <nav class="main-nav">
+            <ul class="menu">
+                <li>
+                    <a href="#" class="active">
+                        <i class="fas fa-chart-bar"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-calendar"></i> Scheduling
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/schedule">Scheduling</a></li>
+                        <li><a href="/timesheet">Timesheets</a></li>
+                        <li><a href="/create-shift-front">Create shift</a></li>
+                        <li><a href="/schedule-approval">Schedule Approval</a></li>
+                        <li><a href="/daily_schedule">Daily Schedule</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-dollar-sign"></i> Billing
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/generateClaims">Generate Claims</a></li>
+                        <li><a href="/generate-invoice">Generate Invoice</a></li>
+                        <li><a href="/view-invoice">View Invoice</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-users"></i> CRM
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/add-client">Add Client</a></li>
+                        <li><a href="/view-client">View Client</a></li>
+                        <li><a href="/serviceAuth">Service Auths</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-heartbeat"></i> Clinical
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/careplan">Care Plan</a></li>
+                        <li><a href="/careplan">Care Giver Evaluation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cogs"></i> Operation
+                        <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="/create-doc">Generate Documents</a></li>
+                        <li><a href="/add-employee">Add Employee</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-container">
+            <div class="breadcrumb">
+                <a href="#">Dashboards</a> &gt; <span>Admin Dashboard</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">TOTAL REVENUE</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">$803,384</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 8.2% from last month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">TOTAL CLAIMS</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">630</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 4.5% from last month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">ACTIVE CLIENTS</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">128</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> 2.7% from last month
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">STAFF MEMBERS</div>
+                            <div class="stat-icon">
+                                <i class="fas fa-user-nurse"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value">74</div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i> 1.5% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chart Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-table"></i> Live Data
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn">Earnings & Expenses</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="claims-summary">
+                            <div class="claim-item">
+                                <span class="claim-label">Denied Claims</span>
+                                <span class="claim-value">38/630</span>
+                            </div>
+                            <div class="claim-item">
+                                <span class="claim-label">Voided Claims</span>
+                                <span class="claim-value">0/630</span>
+                            </div>
+                            <div class="claim-item">
+                                <span class="claim-label">Replaced Claims</span>
+                                <span class="claim-value">0/630</span>
+                            </div>
+                            <div class="claim-item">
+                                <span class="claim-label">Payroll</span>
+                                <span class="claim-value">$0.00/$803,384.29</span>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="yearlyRevenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Column Layout -->
+                <div class="two-column">
+                    <!-- Payments by Payer -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-map-marker-alt"></i> Payments By Payer
+                            </div>
+                            <div class="date-filter">
+                                <input type="text" value="02/15/2025 - 03/17/2025" class="date-range">
+                                <div class="card-actions">
+                                    <button class="btn-icon"><i class="fas fa-search"></i></button>
+                                    <button class="btn-icon"><i class="fas fa-minus"></i></button>
+                                    <button class="btn-icon"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="paymentsByPayerChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Caregiver Schedule -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-calendar"></i> Caregiver Schedule
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-icon"><i class="fas fa-th"></i></button>
+                                <button class="btn-icon"><i class="fas fa-cog"></i></button>
+                                <button class="btn-icon"><i class="fas fa-minus"></i></button>
+                                <button class="btn-icon"><i class="fas fa-expand"></i></button>
+                                <button class="btn-icon"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="calendar-header">
+                                <h3 id="monthHeader">April 2025</h3>
+                                <div class="calendar-nav">
+                                    <button class="btn-icon" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="btn-icon" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue by Payer -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-map-marker-alt"></i> Revenue By Payer
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-icon"><i class="fas fa-search"></i></button>
+                            <button class="btn-icon"><i class="fas fa-minus"></i></button>
+                            <button class="btn-icon"><i class="fas fa-expand"></i></button>
+                            <button class="btn-icon"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable">Payer <i class="fas fa-sort"></i></th>
+                                        <th>This Month</th>
+                                        <th>Last 3 Months</th>
+                                        <th>Last 6 Months</th>
+                                        <th>Last 12 Months</th>
+                                        <th>Life Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Medicare</td>
+                                        <td>$156,732.00</td>
+                                        <td>$468,492.00</td>
+                                        <td>$924,875.00</td>
+                                        <td>$1,843,670.00</td>
+                                        <td>$4,567,890.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Medicaid</td>
+                                        <td>$98,453.00</td>
+                                        <td>$289,786.00</td>
+                                        <td>$583,941.00</td>
+                                        <td>$1,165,832.00</td>
+                                        <td>$2,891,453.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Blue Cross</td>
+                                        <td>$76,534.00</td>
+                                        <td>$219,876.00</td>
+                                        <td>$442,765.00</td>
+                                        <td>$876,543.00</td>
+                                        <td>$1,987,654.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <div class="table-info">Showing 1 to 3 of 3 entries</div>
+                            <div class="pagination">
+                                <button class="btn-sm" disabled>Previous</button>
+                                <button class="btn-sm" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        // Add this script to your page
+// Dashboard data loading script
+document.addEventListener('DOMContentLoaded', function() {
+    // Check login status and load appropriate dashboard data
+    checkLoginStatusAndLoadDashboard();
+    
+    // Login button event handler
+    const loginButton = document.getElementById('login-button');
+    if (loginButton) {
+        loginButton.addEventListener('click', function() {
+            window.location.href = '/login';
+        });
+    }
+
+    // Logout button event handler
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/logout';
+        });
+    }
+
+    // Toggle dropdown when clicking on avatar
+    const avatarContainer = document.getElementById('avatar-container');
+    const userDropdown = document.getElementById('user-dropdown');
+    if (avatarContainer) {
+        avatarContainer.addEventListener('click', function() {
+            userDropdown.style.display = userDropdown.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (avatarContainer && !avatarContainer.contains(event.target) && userDropdown) {
+            userDropdown.style.display = 'none';
+        }
+    });
+});
+
+// Function to check login status and load appropriate dashboard data
+function checkLoginStatusAndLoadDashboard() {
+    fetch('/check-login-status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.loggedIn) {
+                // User is logged in
+                getUserInfo();
+                loadDashboardData(true);
+                
+                // Update UI elements for logged-in state
+                const loginButton = document.getElementById('login-button');
+                const userProfile = document.getElementById('user-profile');
+                if (loginButton) loginButton.style.display = 'none';
+                if (userProfile) userProfile.style.display = 'flex';
+            } else {
+                // User is not logged in
+                loadDashboardData(false);
+                
+                // Update UI elements for logged-out state
+                const loginButton = document.getElementById('login-button');
+                const userProfile = document.getElementById('user-profile');
+                if (loginButton) loginButton.style.display = 'flex';
+                if (userProfile) userProfile.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking login status:', error);
+        });
+}
+
+// Function to get user info
+function getUserInfo() {
+    fetch('/get-user-info')
+        .then(response => response.json())
+        .then(user => {
+            if (user) {
+                const userAvatar = document.getElementById('user-avatar');
+                const userName = document.getElementById('user-name');
+                const userEmail = document.getElementById('user-email');
+                
+                if (userAvatar) userAvatar.src = user.picture || '/static/default-profile.png';
+                if (userName) userName.textContent = user.name || 'User';
+                if (userEmail) userEmail.textContent = user.email || '';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user info:', error);
+        });
+}
+
+// Load dashboard data based on authentication status
+function loadDashboardData(isAuthenticated) {
+    fetch('/api/dashboard-stats')
+        .then(response => response.json())
+        .then(data => {
+            // Update the dashboard with received data
+            updateDashboardStats(data);
+            
+            // Update chart data if authenticated
+            if (isAuthenticated) {
+                initializeCharts(data);
+            } else {
+                // Display placeholder charts
+                initializePlaceholderCharts();
+                
+                // Add login prompt overlay to charts
+                addLoginPromptToCharts();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+        });
+}
+
+// Update the dashboard UI with stats
+function updateDashboardStats(data) {
+    // Update stat cards
+    document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = isNaN(data.total_revenue) ? data.total_revenue : '$' + data.total_revenue.toLocaleString();
+    document.querySelector('.stat-card:nth-child(1) .stat-change').innerHTML = `<i class="fas fa-arrow-${data.revenue_change >= 0 ? 'up' : 'down'}"></i> ${isNaN(data.revenue_change) ? data.revenue_change : data.revenue_change + '%'} from last month`;
+    
+    document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = data.total_claims;
+    document.querySelector('.stat-card:nth-child(2) .stat-change').innerHTML = `<i class="fas fa-arrow-${data.claims_change >= 0 ? 'up' : 'down'}"></i> ${isNaN(data.claims_change) ? data.claims_change : data.claims_change + '%'} from last month`;
+    
+    document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = data.active_clients;
+    document.querySelector('.stat-card:nth-child(3) .stat-change').innerHTML = `<i class="fas fa-arrow-${data.clients_change >= 0 ? 'up' : 'down'}"></i> ${isNaN(data.clients_change) ? data.clients_change : data.clients_change + '%'} from last month`;
+    
+    document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = data.staff_members;
+    document.querySelector('.stat-card:nth-child(4) .stat-change').innerHTML = `<i class="fas fa-arrow-${data.staff_change >= 0 ? 'up' : 'down'}"></i> ${isNaN(data.staff_change) ? data.staff_change : Math.abs(data.staff_change) + '%'} from last month`;
+    
+    // Update claims summary
+    document.querySelector('.claim-item:nth-child(1) .claim-value').textContent = `${data.denied_claims}/${data.total_claims}`;
+    document.querySelector('.claim-item:nth-child(2) .claim-value').textContent = `${data.voided_claims}/${data.total_claims}`;
+    document.querySelector('.claim-item:nth-child(3) .claim-value').textContent = `${data.replaced_claims}/${data.total_claims}`;
+    document.querySelector('.claim-item:nth-child(4) .claim-value').textContent = `$${data.payroll}/${isNaN(data.payroll_total) ? data.payroll_total : '$' + data.payroll_total.toLocaleString()}`;
+    
+    // Update revenue by payer table
+    if (!data.placeholder) {
+        updateRevenueTable(data.revenue_by_payer);
+    } else {
+        // Use placeholder data for the table
+        const rows = document.querySelectorAll('.data-table tbody tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            for (let i = 1; i < cells.length; i++) {
+                cells[i].textContent = 'XXXXX';
+            }
+        });
+    }
+}
+
+// Update revenue table with real data
+function updateRevenueTable(revenueData) {
+    const tbody = document.querySelector('.data-table tbody');
+    tbody.innerHTML = ''; // Clear existing rows
+    
+    for (const [payer, values] of Object.entries(revenueData)) {
+        const row = document.createElement('tr');
+        
+        const nameCell = document.createElement('td');
+        nameCell.textContent = payer;
+        row.appendChild(nameCell);
+        
+        // Add cells for each time period
+        row.appendChild(createCell(values.this_month));
+        row.appendChild(createCell(values.last_3_months));
+        row.appendChild(createCell(values.last_6_months));
+        row.appendChild(createCell(values.last_12_months));
+        row.appendChild(createCell(values.lifetime));
+        
+        tbody.appendChild(row);
+    }
+}
+
+// Helper to create a formatted cell for the revenue table
+function createCell(value) {
+    const cell = document.createElement('td');
+    cell.textContent = isNaN(value) ? value : '$' + parseFloat(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    return cell;
+}
+
+// Initialize charts with real data
+function initializeCharts(data) {
+    // Clear any existing charts
+    if (window.yearlyRevenueChart) window.yearlyRevenueChart.destroy();
+    if (window.paymentsByPayerChart) window.paymentsByPayerChart.destroy();
+    
+    // Initialize yearly revenue chart
+    const yearlyRevenueChart = new Chart(
+        document.getElementById('yearlyRevenueChart'),
+        {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        backgroundColor: 'rgba(90, 61, 102, 0.1)',
+                        borderColor: '#5a3d66',
+                        data: [65000, 72000, 74000, 81000, 79000, 85000, 90000, 88000, 92000, 95000, 98000, 103000],
+                        tension: 0.3,
+                        fill: true
+                    },
+                    { 
+                        label: 'Expenses',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        data: [50000, 60000, 58000, 62000, 61000, 65000, 67000, 68000, 70000, 72000, 74000, 76000],
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Yearly Revenue and Expenses'
+                    }
+                }
+            }
+        }
+    );
+    
+    // Initialize payments by payer chart
+    const paymentsByPayerChart = new Chart(
+        document.getElementById('paymentsByPayerChart'),
+        {
+            type: 'pie',
+            data: {
+                labels: ['Medicare', 'Medicaid', 'Blue Cross', 'Other Insurance'],
+                datasets: [{
+                    data: [45, 30, 15, 10],
+                    backgroundColor: [
+                        'rgba(90, 61, 102, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Payments Distribution by Payer'
+                    }
+                }
+            }
+        }
+    );
+    
+    window.yearlyRevenueChart = yearlyRevenueChart;
+    window.paymentsByPayerChart = paymentsByPayerChart;
+}
+
+// Initialize charts with placeholder data
+function initializePlaceholderCharts() {
+    // Similar to initializeCharts but with blurred or minimal data
+    if (window.yearlyRevenueChart) window.yearlyRevenueChart.destroy();
+    if (window.paymentsByPayerChart) window.paymentsByPayerChart.destroy();
+    
+    // Yearly revenue chart with placeholder data
+    const yearlyRevenueChart = new Chart(
+        document.getElementById('yearlyRevenueChart'),
+        {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        backgroundColor: 'rgba(200, 200, 200, 0.1)',
+                        borderColor: '#cccccc',
+                        data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+                        tension: 0.3,
+                        fill: true
+                    },
+                    { 
+                        label: 'Expenses',
+                        backgroundColor: 'rgba(220, 220, 220, 0.1)',
+                        borderColor: '#dddddd',
+                        data: [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Login to view actual data'
+                    }
+                }
+            }
+        }
+    );
+    
+    // Payments by payer chart with placeholder data
+    const paymentsByPayerChart = new Chart(
+        document.getElementById('paymentsByPayerChart'),
+        {
+            type: 'pie',
+            data: {
+                labels: ['Login to view actual data'],
+                datasets: [{
+                    data: [100],
+                    backgroundColor: ['rgba(200, 200, 200, 0.8)']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Login to view payment distribution'
+                    }
+                }
+            }
+        }
+    );
+    
+    window.yearlyRevenueChart = yearlyRevenueChart;
+    window.paymentsByPayerChart = paymentsByPayerChart;
+}
+
+// Add login prompt overlay to charts for non-authenticated users
+function addLoginPromptToCharts() {
+    const chartContainers = document.querySelectorAll('.chart-container');
+    
+    chartContainers.forEach(container => {
+        // Create overlay element
+        const overlay = document.createElement('div');
+        overlay.className = 'chart-login-overlay';
+        overlay.innerHTML = `
+            <div class="login-prompt">
+                <i class="fas fa-lock"></i>
+                <p>Please log in to view detailed analytics</p>
+                <button class="login-prompt-btn">Login</button>
+            </div>
+        `;
+        
+        // Style the overlay
+        overlay.style.position = 'absolute';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = '10';
+        overlay.style.borderRadius = '5px';
+        
+        // Add relative positioning to container if not already set
+        container.style.position = 'relative';
+        
+        // Add overlay to container
+        container.appendChild(overlay);
+        
+        // Add click event to login button
+        const loginBtn = overlay.querySelector('.login-prompt-btn');
+        loginBtn.addEventListener('click', () => {
+            window.location.href = '/login';
+        });
+    });
+}
+    </script>
+</body>
+</html> 

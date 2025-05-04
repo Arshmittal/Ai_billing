@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Approval</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --success: #2ec4b6;
+            --danger: #e63946;
+            --secondary: #5c6784;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .page-header {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table thead th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+            border: none;
+            padding: 1rem;
+            white-space: nowrap;
+        }
+        
+        .table tbody tr {
+            transition: background-color 0.2s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 50rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-approve {
+            background-color: var(--success);
+            border: none;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background-color: #25a599;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 196, 182, 0.3);
+        }
+        
+        .btn-reject {
+            background-color: var(--danger);
+            border: none;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background-color: #d1303c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(230, 57, 70, 0.3);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+        }
+        
+        .search-input {
+            padding-left: 2.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            height: 3rem;
+        }
+        
+        .filter-select {
+            border-radius: 0.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            height: 3rem;
+            min-width: 200px;
+        }
+        
+        .status-pending {
+            background-color: #ffb703;
+            color: #181818;
+        }
+        
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .pagination {
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .pagination .page-item .page-link {
+            border: none;
+            color: var(--secondary);
+            border-radius: 0.5rem;
+            margin: 0 0.2rem;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .action-cell {
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-1">Schedule Approval</h1>
+                <p class="text-muted">Review and approve schedule entries</p>
+            </div>
+            <div>
+                <button class="btn btn-primary">
+                    <i class="fas fa-download me-2"></i>Export
+                </button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="filters">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="form-control search-input" placeholder="Search by client, employee, service...">
+                    </div>
+                    <select id="clientSelect" class="form-select filter-select">
+                        <option value="">All Clients</option>
+                        <!-- Client options will be populated dynamically -->
+                    </select>
+                    <select id="statusSelect" class="form-select filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" class="form-check-input" id="selectAll"></th>
+                            <th>Client</th>
+                            <th>Employee(s)</th>
+                            <th>Payer</th>
+                            <th>Worked Date</th>
+                            <th>Hours</th>
+                            <th>Service Code</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody">
+                        <!-- Schedule data will be populated here -->
+                    </tbody>
+                </table>
+                
+                <div id="emptyState" class="empty-state d-none">
+                    <img src="/api/placeholder/120/120" alt="No schedules found" class="mb-3">
+                    <h5>No schedules found</h5>
+                    <p class="text-muted">Try adjusting your filters or search criteria</p>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white">
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+                            </a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Schedule Details Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scheduleModalLabel">Schedule Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Client</label>
+                            <p id="modalClient" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Employee(s)</label>
+                            <p id="modalEmployees" class="fw-bold">-</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted">Payer</label>
+                            <p id="modalPayer" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted">Worked Date</label>
+                            <p id="modalWorkedDate" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted">Worked Hours</label>
+                            <p id="modalWorkedHours" class="fw-bold">-</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Service Code</label>
+                            <p id="modalServiceCode" class="fw-bold">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Services</label>
+                            <p id="modalServices" class="fw-bold">-</p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Remarks</label>
+                        <p id="modalRemarks" class="fw-bold">-</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Internal Notes</label>
+                        <p id="modalInternalNotes" class="fw-bold">-</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewNotes" class="form-label">Review Notes</label>
+                        <textarea id="reviewNotes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-reject" id="modalRejectBtn">Reject</button>
+                    <button type="button" class="btn btn-approve" id="modalApproveBtn">Approve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let schedules = [];
+            let clients = new Set();
+            let currentScheduleId = null;
+            
+            // Initialize modals
+            const scheduleModal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+            
+            // Fetch schedules from API
+            fetchSchedules();
+            
+            function fetchSchedules() {
+                // Simulate API call with sample data for demo
+                setTimeout(() => {
+                    schedules = [
+                        {
+                            _id: "1",
+                            client: "John Doe",
+                            employees: ["Sarah Johnson", "Mike Wilson"],
+                            payer: "Medicare",
+                            workedDate: "2025-04-10",
+                            workedHours: 4.5,
+                            serviceCode: "HC001",
+                            services: ["Home Care", "Meal Preparation"],
+                            remarks: "Client is responding well to therapy",
+                            internalNotes: "Recommend continuing with current schedule",
+                            status: "pending"
+                        },
+                        {
+                            _id: "2",
+                            client: "Mary Smith",
+                            employees: ["Robert Brown"],
+                            payer: "Private Insurance",
+                            workedDate: "2025-04-09",
+                            workedHours: 3,
+                            serviceCode: "PT002",
+                            services: ["Physical Therapy"],
+                            remarks: "Mobility improving gradually",
+                            internalNotes: "Consider increasing sessions next month",
+                            status: "pending"
+                        },
+                        {
+                            _id: "3",
+                            client: "James Wilson",
+                            employees: ["Emily Davis", "Thomas Clark"],
+                            payer: "Medicaid",
+                            workedDate: "2025-04-08",
+                            workedHours: 6,
+                            serviceCode: "HC003",
+                            services: ["Home Care", "Personal Hygiene", "Medication Management"],
+                            remarks: "Client expressed satisfaction with services",
+                            internalNotes: "No issues reported",
+                            status: "pending"
+                        }
+                    ];
+                    
+                    // Extract unique clients for filter
+                    schedules.forEach(schedule => {
+                        clients.add(schedule.client);
+                    });
+                    
+                    // Populate client filter
+                    populateClientFilter();
+                    
+                    // Render schedules
+                    renderSchedules(schedules);
+                }, 500);
+            }
+            
+            function populateClientFilter() {
+                const clientSelect = $('#clientSelect');
+                clients.forEach(client => {
+                    clientSelect.append(`<option value="${client}">${client}</option>`);
+                });
+            }
+            
+            function renderSchedules(data) {
+                const tableBody = $('#scheduleTableBody');
+                tableBody.empty();
+                
+                if (data.length === 0) {
+                    $('#emptyState').removeClass('d-none');
+                    return;
+                }
+                
+                $('#emptyState').addClass('d-none');
+                
+                data.forEach(schedule => {
+                    const statusBadge = getStatusBadge(schedule.status);
+                    
+                    tableBody.append(`
+                        <tr data-id="${schedule._id}">
+                            <td><input type="checkbox" class="form-check-input schedule-check"></td>
+                            <td>${schedule.client}</td>
+                            <td>${schedule.employees.join(', ')}</td>
+                            <td>${schedule.payer}</td>
+                            <td>${formatDate(schedule.workedDate)}</td>
+                            <td>${schedule.workedHours}</td>
+                            <td>${schedule.serviceCode}</td>
+                            <td>${statusBadge}</td>
+                            <td class="action-cell">
+                                <button class="btn btn-sm btn-outline-secondary view-details me-1" data-id="${schedule._id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-approve approve-btn me-1" data-id="${schedule._id}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-sm btn-reject reject-btn" data-id="${schedule._id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+                
+                // Attach event listeners
+                attachEventListeners();
+            }
+            
+            function attachEventListeners() {
+                // View details button
+                $('.view-details').on('click', function() {
+                    const scheduleId = $(this).data('id');
+                    const schedule = schedules.find(s => s._id === scheduleId);
+                    
+                    // Populate modal
+                    $('#modalClient').text(schedule.client);
+                    $('#modalEmployees').text(schedule.employees.join(', '));
+                    $('#modalPayer').text(schedule.payer);
+                    $('#modalWorkedDate').text(formatDate(schedule.workedDate));
+                    $('#modalWorkedHours').text(schedule.workedHours);
+                    $('#modalServiceCode').text(schedule.serviceCode);
+                    $('#modalServices').text(schedule.services.join(', '));
+                    $('#modalRemarks').text(schedule.remarks);
+                    $('#modalInternalNotes').text(schedule.internalNotes);
+                    
+                    // Store current schedule ID for approve/reject actions
+                    currentScheduleId = scheduleId;
+                    
+                    // Show modal
+                    scheduleModal.show();
+                });
+                
+                // Quick approve button
+                $('.approve-btn').on('click', function() {
+                    const scheduleId = $(this).data('id');
+                    approveSchedule(scheduleId);
+                });
+                
+                // Quick reject button
+                $('.reject-btn').on('click', function() {
+                    const scheduleId = $(this).data('id');
+                    rejectSchedule(scheduleId);
+                });
+                
+                // Modal approve button
+                $('#modalApproveBtn').on('click', function() {
+                    if (currentScheduleId) {
+                        approveSchedule(currentScheduleId);
+                        scheduleModal.hide();
+                    }
+                });
+                
+                // Modal reject button
+                $('#modalRejectBtn').on('click', function() {
+                    if (currentScheduleId) {
+                        rejectSchedule(currentScheduleId);
+                        scheduleModal.hide();
+                    }
+                });
+                
+                // Select all checkbox
+                $('#selectAll').on('change', function() {
+                    const isChecked = $(this).prop('checked');
+                    $('.schedule-check').prop('checked', isChecked);
+                });
+                
+                // Filter by client
+                $('#clientSelect').on('change', function() {
+                    applyFilters();
+                });
+                
+                // Filter by status
+                $('#statusSelect').on('change', function() {
+                    applyFilters();
+                });
+                
+                // Search
+                $('#searchInput').on('input', function() {
+                    applyFilters();
+                });
+            }
+            
+            function applyFilters() {
+                const selectedClient = $('#clientSelect').val();
+                const selectedStatus = $('#statusSelect').val();
+                const searchTerm = $('#searchInput').val().toLowerCase();
+                
+                let filteredSchedules = [...schedules];
+                
+                // Apply client filter
+                if (selectedClient) {
+                    filteredSchedules = filteredSchedules.filter(s => s.client === selectedClient);
+                }
+                
+                // Apply status filter
+                if (selectedStatus) {
+                    filteredSchedules = filteredSchedules.filter(s => s.status === selectedStatus);
+                }
+                
+                // Apply search filter
+                if (searchTerm) {
+                    filteredSchedules = filteredSchedules.filter(s => 
+                        s.client.toLowerCase().includes(searchTerm) ||
+                        s.employees.some(e => e.toLowerCase().includes(searchTerm)) ||
+                        s.payer.toLowerCase().includes(searchTerm) ||
+                        s.services.some(srv => srv.toLowerCase().includes(searchTerm)) ||
+                        s.serviceCode.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                renderSchedules(filteredSchedules);
+            }
+            
+            function approveSchedule(scheduleId) {
+                const reviewNotes = $('#reviewNotes').val();
+                
+                // In a real app, this would be an API call
+                console.log(`Approving schedule ${scheduleId} with notes: ${reviewNotes}`);
+                
+                // Update local state for demo
+                const scheduleIndex = schedules.findIndex(s => s._id === scheduleId);
+                if (scheduleIndex !== -1) {
+                    schedules[scheduleIndex].status = 'approved';
+                    renderSchedules(schedules);
+                    
+                    // Show success toast
+                    showToast('Schedule approved successfully!', 'success');
+                }
+            }
+            
+            function rejectSchedule(scheduleId) {
+                const reviewNotes = $('#reviewNotes').val();
+                
+                // In a real app, this would be an API call
+                console.log(`Rejecting schedule ${scheduleId} with notes: ${reviewNotes}`);
+                
+                // Update local state for demo
+                const scheduleIndex = schedules.findIndex(s => s._id === scheduleId);
+                if (scheduleIndex !== -1) {
+                    schedules[scheduleIndex].status = 'rejected';
+                    renderSchedules(schedules);
+                    
+                    // Show error toast
+                    showToast('Schedule rejected', 'danger');
+                }
+            }
+            
+            function getStatusBadge(status) {
+                switch (status) {
+                    case 'approved':
+                        return '<span class="badge bg-success">Approved</span>';
+                    case 'rejected':
+                        return '<span class="badge bg-danger">Rejected</span>';
+                    default:
+                        return '<span class="badge status-pending">Pending</span>';
+                }
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+            }
+            
+            function showToast(message, type) {
+                // Create toast container if it doesn't exist
+                if ($('#toastContainer').length === 0) {
+                    $('body').append(`
+                        <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050;"></div>
+                    `);
+                }
+                
+                // Generate a unique ID for the toast
+                const toastId = 'toast-' + Date.now();
+                
+                // Create toast
+                const toast = `
+                    <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add toast to container
+                $('#toastContainer').append(toast);
+                
+                // Initialize and show toast
+                const toastElement = new bootstrap.Toast(document.getElementById(toastId), {
+                    autohide: true,
+                    delay: 3000
+                });
+                toastElement.show();
+            }
+        });
+    </script>
+</body>
+</html>

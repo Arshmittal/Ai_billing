@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Client Details</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="clientForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <div class="input-group">
+                                <input type="text" id="firstName" name="firstName">
+                                <span class="input-icon"><i class="fas fa-user"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="middleName">Middle Name</label>
+                            <div class="input-group">
+                                <input type="text" id="middleName" name="middleName">
+                                <span class="input-icon"><i class="fas fa-user"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <div class="input-group">
+                                <input type="text" id="lastName" name="lastName">
+                                <span class="input-icon"><i class="fas fa-user"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="preferredName">Preferred Name</label>
+                            <div class="input-group">
+                                <input type="text" id="preferredName" name="preferredName">
+                                <span class="input-icon"><i class="fas fa-user"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="memberId">Member ID(PMI)</label>
+                            <div class="input-group">
+                                <input type="text" id="memberId" name="memberId">
+                                <span class="input-icon"><i class="fas fa-id-card"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender">
+                                <option value="">Please Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pronouns">Pronouns</label>
+                            <select id="pronouns" name="pronouns">
+                                <option value="">Select or enter Pronouns</option>
+                                <option value="he-him">He/Him</option>
+                                <option value="she-her">She/Her</option>
+                                <option value="they-them">They/Them</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthdate">Birthdate</label>
+                            <div class="input-group date">
+                                <input type="text" id="birthdate" name="birthdate" placeholder="yyyy-mm-dd">
+                                <span class="input-icon"><i class="fas fa-calendar"></i></span>
+                            </div>
+                            <span class="year-indicator">year(s)</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="socialSecurity">Social Security</label>
+                            <div class="input-group">
+                                <input type="text" id="socialSecurity" name="socialSecurity" placeholder="111-22-3333">
+                                <span class="input-icon"><i class="fas fa-id-card"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="primaryPhone">Primary Phone ( Mobile? )</label>
+                            <div class="input-group">
+                                <input type="text" id="primaryPhone" name="primaryPhone">
+                                <span class="input-icon"><i class="fas fa-phone"></i></span>
+                            </div>
+                            <input type="checkbox" id="primaryMobile" name="primaryMobile">
+                        </div>
+                        <div class="form-group">
+                            <label for="secondaryPhone">Secondary Phone ( Mobile? )</label>
+                            <div class="input-group">
+                                <input type="text" id="secondaryPhone" name="secondaryPhone">
+                                <span class="input-icon"><i class="fas fa-phone"></i></span>
+                            </div>
+                            <input type="checkbox" id="secondaryMobile" name="secondaryMobile">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <div class="input-group">
+                                <input type="email" id="email" name="email">
+                                <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <div class="input-group">
+                                <input type="text" id="address" name="address">
+                                <span class="input-icon"><i class="fas fa-home"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="zipCode">ZIP Code</label>
+                            <select id="zipCode" name="zipCode">
+                                <option value="">Select ZIP Code</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State Or Province</label>
+                            <select id="state" name="state">
+                                <option value="">Select State</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AK">Alaska</option>
+                                <!-- Add all states here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="referralSource">Referral Source</label>
+                            <div class="select-with-tag">
+                                <select id="referralSource" name="referralSource">
+                                    <option value="self">Self</option>
+                                    <option value="physician">Physician</option>
+                                    <option value="insurance">Insurance</option>
+                                    <option value="friend">Friend/Family</option>
+                                </select>
+                                <span class="tag">Self</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="serviceDays">Service Days</label>
+                            <select id="serviceDays" name="serviceDays">
+                                <option value="">Please Select</option>
+                                <option value="monday">Monday</option>
+                                <option value="tuesday">Tuesday</option>
+                                <option value="wednesday">Wednesday</option>
+                                <option value="thursday">Thursday</option>
+                                <option value="friday">Friday</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="requestedServices">Requested Services...</label>
+                            <select id="requestedServices" name="requestedServices">
+                                <option value="">Select Requested Services</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="waiver">Waiver...</label>
+                            <select id="waiver" name="waiver">
+                                <option value="">Select Waiver</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="internalClientManager">Internal Client Manager</label>
+                            <select id="internalClientManager" name="internalClientManager">
+                                <option value="">Select Client Manager</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="primaryPayer">Primary Payer</label>
+                            <select id="primaryPayer" name="primaryPayer">
+                                <option value="">Select Primary Payer</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <div class="select-with-tag">
+                                <input type="text" id="status" name="status" readonly value="Pre-Admission">
+                                <span class="tag">Pre-Admission</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="medicareNumber">Medicare Number</label>
+                            <div class="input-group">
+                                <input type="text" id="medicareNumber" name="medicareNumber">
+                                <span class="input-icon"><i class="fas fa-hashtag"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="hmoNumber">HMO Number</label>
+                            <div class="input-group">
+                                <input type="text" id="hmoNumber" name="hmoNumber">
+                                <span class="input-icon"><i class="fas fa-hashtag"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="medicalRecordNumber">Medical Record Number</label>
+                            <input type="text" id="medicalRecordNumber" name="medicalRecordNumber">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="livesWith">Lives With</label>
+                            <select id="livesWith" name="livesWith">
+                                <option value="">Select Lives With</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateOfAssessment">Date Of Assessment</label>
+                            <input type="text" id="dateOfAssessment" name="dateOfAssessment" placeholder="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group">
+                            <label for="startOfCare">Start Of Care</label>
+                            <input type="text" id="startOfCare" name="startOfCare" placeholder="yyyy-mm-dd">
+                        </div>
+                        <div class="form-group">
+                            <label for="medicaidNumber">Medicaid Number</label>
+                            <input type="text" id="medicaidNumber" name="medicaidNumber">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="photo">Photo</label>
+                            <div class="upload-area" id="uploadArea">
+                                <p>Click or Drop files to upload</p>
+                                <div class="upload-icon">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <input type="file" id="photo" name="photo" hidden>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-submit">Save</button>
+                        <button type="button" class="btn-cancel">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+     
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    
+</body>
+</html>

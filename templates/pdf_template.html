@@ -1,0 +1,144 @@
+<!-- templates/pdf_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ client_name }} - {{ document_type }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .client-info {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .document-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h4 {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .signature-section {
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .signature-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .signature-line > div {
+            border-top: 1px solid #000;
+            width: 45%;
+            padding-top: 5px;
+            text-align: center;
+        }
+        .date-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .date-line > div {
+            width: 45%;
+        }
+        .signature-image {
+            max-width: 200px;
+            max-height: 80px;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        a {
+            color: #0066cc;
+        }
+        .page-number {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>MN Department of Human Services • Office of Inspector General Licensing Division</h2>
+        <h3>{{ document_type }}</h3>
+    </div>
+    
+    <div class="client-info">
+        <strong>Client:</strong> {{ client_name }}
+    </div>
+
+    <div class="document-title">
+        <h3>Program: {{ program_name }}</h3>
+    </div>
+    
+    <div class="section">
+        <h4>E. Individual access to private data.</h4>
+        <p>Individuals or their legal representatives have a right to access and review the individual record.</p>
+        <ol>
+            <li>A staff person will be present during the review and will make an entry in the person's progress notes as to the person who accessed the record, date and time of review, and list any copies made from the record.</li>
+            <li>An individual may challenge the accuracy or completeness of information contained in the record. Staff will refer the individual to the grievance policy for lodging a complaint.</li>
+            <li>Individuals may request copies of pages in their record.</li>
+            <li>No individual, legal representative, staff person, or anyone else may permanently remove or destroy any portion of the person's record.</li>
+        </ol>
+    </div>
+    
+    <div class="section">
+        <h4>F. Case manager access to private data.</h4>
+        <p>A person's case manager and the foster care licensor have access to the records of person's served by the program under section 245D.095, subd. 4.</p>
+    </div>
+    
+    <div class="section">
+        <h4>G. Requesting information from other licensed caregivers or primary health care providers.</h4>
+        <ol>
+            <li>Complete the attached release of information authorization form. Carefully list all the consults, reports or assessments needed, giving specific dates whenever possible. Also, identify the purpose for the request.</li>
+            <li>Clearly identify the person or agency requiring the information. If information is to be sent to the program's health care consultant or other staff at the program, include Attention: (name of person to receive the information), and the name and address of the program.</li>
+            <li>Assure informed consent to share the requested private data with the person or entity has been obtained from the person or the legal representative.</li>
+            <li>Keep the document in the person's record.</li>
+        </ol>
+    </div>
+    
+    <div class="signature-section">
+        <p>Policy reviewed and authorized by:</p>
+        <div class="signature-line">
+            <div>{{ print_name_title }}</div>
+            <div>
+                {% if signature %}
+                <img class="signature-image" src="data:image/png;base64,{{ signature }}" alt="Signature">
+                {% endif %}
+            </div>
+        </div>
+        <div class="date-line">
+            <div>Date of last policy review: {{ date_review }}</div>
+            <div>Date of last policy revision: {{ date_revision }}</div>
+        </div>
+        <p>Legal Authority: MS § <a href="#">245D.11</a>, subd. 3</p>
+    </div>
+    
+    <div class="page-number">
+        Page 3 of 3
+    </div>
+</body>
+</html>

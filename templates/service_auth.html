@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Authorization Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Service Authorization Management</h1>
+            <div class="tabs">
+                <button id="pdf-tab" class="tab-btn active">Upload PDF</button>
+                <button id="manual-tab" class="tab-btn">Manual Entry</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- PDF Upload Section -->
+            <section id="pdf-section" class="section-active">
+                <h2>Upload Service Authorization PDF</h2>
+                <form id="pdf-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="pdf-file">Select PDF File:</label>
+                        <input type="file" id="pdf-file" name="pdf" accept=".pdf" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn primary-btn">Extract Data</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Manual Entry Section -->
+            <section id="manual-section" class="section-hidden">
+                <h2>Manual Service Authorization Entry</h2>
+                <form id="manual-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payer">Payer:</label>
+                            <select id="payer" name="payer" required>
+                                <option value="">Select Payer</option>
+                                <option value="MINNESOTA DEPT OF HUMAN SERVICES">MINNESOTA DEPT OF HUMAN SERVICES</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="memberId">Member ID:</label>
+                            <input type="text" id="memberId" name="memberId" placeholder="e.g. 06051184">
+                        </div>
+                        <div class="form-group">
+                            <label for="insuranceTypeCode">Insurance Type Code:</label>
+                            <select id="insuranceTypeCode" name="insuranceTypeCode">
+                                <option value="">Select Type</option>
+                                <option value="MC (Medicaid)">MC (Medicaid)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="claimingFactor">Claiming Factor:</label>
+                            <select id="claimingFactor" name="claimingFactor">
+                                <option value="">Select Factor</option>
+                                <option value="MC (Medicaid)">MC (Medicaid)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="groupId">Group ID:</label>
+                            <input type="text" id="groupId" name="groupId">
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceAuthNumber">Service Auth #:</label>
+                            <input type="text" id="serviceAuthNumber" name="serviceAuthNumber">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="procedureServiceCode">Procedure Service Code:</label>
+                            <input type="text" id="procedureServiceCode" name="procedureServiceCode" placeholder="e.g. S5150">
+                        </div>
+                        <div class="form-group">
+                            <label for="modifierCode">Modifier Code:</label>
+                            <input type="text" id="modifierCode" name="modifierCode" placeholder="e.g. UA">
+                        </div>
+                        <div class="form-group">
+                            <label for="dates">Service Dates:</label>
+                            <input type="text" id="dates" name="dates" placeholder="MM/DD/YYYY - MM/DD/YYYY">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="units">Units:</label>
+                            <input type="text" id="units" name="units" placeholder="e.g. 4164.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceRate">Service Rate:</label>
+                            <input type="text" id="serviceRate" name="serviceRate" placeholder="e.g. 9.64">
+                        </div>
+                        <div class="form-group">
+                            <label for="usageType">Usage Type:</label>
+                            <input type="text" id="usageType" name="usageType" placeholder="e.g. Flexible Usage">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pos">POS:</label>
+                            <input type="text" id="pos" name="pos" placeholder="e.g. 12 (Home)">
+                        </div>
+                        <div class="form-group">
+                            <label for="dailyUsage">Daily Usage:</label>
+                            <input type="text" id="dailyUsage" name="dailyUsage">
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="notBillable" name="notBillable">
+                                Not Billable
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn primary-btn">Save Authorization</button>
+                        <button type="reset" class="btn secondary-btn">Reset Form</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="section-hidden">
+                <h2>Service Authorization Details</h2>
+                <div class="results-actions">
+                    <button id="print-btn" class="btn secondary-btn">Print</button>
+                    <button id="export-pdf-btn" class="btn secondary-btn">Export as PDF</button>
+                    <button id="new-entry-btn" class="btn primary-btn">New Entry</button>
+                </div>
+                <div class="table-container">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>Payer</th>
+                                <th>Member ID</th>
+                                <th>Service Auth #</th>
+                                <th>Procedure & Modifier</th>
+                                <th>Dates</th>
+                                <th>Units</th>
+                                <th>Service Rate</th>
+                                <th>Used Units</th>
+                                <th>Total Hours Remaining</th>
+                                <th>Hours Per Day</th>
+                                <th>Hours Per Week</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            <!-- Results will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Loading Overlay -->
+            <div id="loading-overlay" class="loading-hidden">
+                <div class="spinner"></div>
+                <p>Processing your request...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

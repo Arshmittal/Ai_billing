@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinical Care Plan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 10px;
+        }
+        .save-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clinical Care Plan</h1>
+    <form id="carePlanForm">
+        <div class="form-container">
+            <div class="form-section">
+                <h2>Care Plan Details</h2>
+                <div class="form-group">
+                    <label>Care Plan</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pcaCheck" name="carePlan" value="PCA">
+                        <label for="pcaCheck">PCA</label>
+                        <input type="checkbox" id="pcaCheck" name="carePlan" value="HMK">
+                        <label for="pcaCheck">HMK</label>
+                        <input type="checkbox" id="pcaCheck" name="carePlan" value="CFSS">
+                        <label for="pcaCheck">CFSS</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Client</label>
+                    <select id="client" name="client" required>
+                        <option value="">Select Client</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Employee</label>
+                    <input type="text" id="employee" name="employee">
+                </div>
+
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="startDate" name="startDate">
+                </div>
+
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" id="endDate" name="endDate">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Services and Goals</h2>
+                <div class="form-group">
+                    <label>Services</label>
+                    <select id="services" name="services">
+                        <option value="">Select Services</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select id="frequency" name="frequency">
+                        <option value="">Select Frequency</option>
+                        <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Bi-Weekly">Bi-Weekly</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Bi-Monthly">Bi-Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                        <option value="Yearly">Yearly</option>
+                        <option value="2 days">2 days</option>
+                        <option value="3 days">3 days</option>
+                        <option value="4 days">4 days</option>
+                        <option value="5 days">5 days</option>
+                        <option value="6 days">6 days</option>
+                        <option value="1 day">1 day</option>
+                        <option value="Bi-yearly">Bi-yearly</option>
+                        <option value="Every Other Day">Every Other Day</option>
+                        <option value="Every 72 hours">Every 72 hours</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Goals</label>
+                    <select id="goals" name="goals">
+                        <option value="Promote self-care/independence">Promote self-care/independence</option>
+                        <option value="Maintain stability">Maintain stability</option>
+                        <option value="Maintain dignity">Maintain dignity</option>
+                        <option value="Assure safety">Assure safety</option>
+                        <option value="Maintain hygiene">Maintain hygiene</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Other Tasks</label>
+                    <textarea id="otherTasks" name="otherTasks" rows="4"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Additional Details</h2>
+            <div class="form-group">
+                <label>Remarks</label>
+                <textarea id="remarks" name="remarks" rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Procedures</label>
+                <textarea id="procedures" name="procedures" rows="4"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="save-btn">Save Care Plan</button>
+        </div>
+    </form>
+
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('carePlanForm');
+    const clientSelect = document.getElementById('client');
+
+    // Fetch client names when page loads
+    async function fetchClientNames() {
+        try {
+            const response = await fetch('/get-clients');
+            const clients = await response.json();
+            
+            // Clear existing options (except the first "Select Client" option)
+            while (clientSelect.options.length > 1) {
+                clientSelect.remove(1);
+            }
+            
+            // Populate client dropdown
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                
+                // Create a descriptive display text
+                let displayText = client.fullName;
+                if (client.memberId) {
+                    displayText += ` (ID: ${client.memberId})`;
+                }
+                if (client.status) {
+                    displayText += ` - ${client.status}`;
+                }
+                
+                option.textContent = displayText;
+                clientSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error fetching client names:', error);
+            alert('Failed to load client list');
+        }
+    }
+
+    // Fetch client details when a client is selected
+    clientSelect.addEventListener('change', async (e) => {
+        const selectedClientId = e.target.value;
+        
+        if (!selectedClientId) return;
+
+        try {
+            const response = await fetch(`/get-client-details/${selectedClientId}`);
+            const clientDetails = await response.json();
+            
+            // Optionally populate other form fields with client details
+            document.getElementById('employee').value = clientDetails.internalClientManager || '';
+            
+            // You could add more field population here based on your form's needs
+        } catch (error) {
+            console.error('Error fetching client details:', error);
+        }
+    });
+
+    // Call fetch client names on page load
+    fetchClientNames();
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Collect form data
+        const formData = {
+            carePlan: document.getElementById('pcaCheck').checked,
+            clientId: document.getElementById('client').value,
+            client: document.getElementById('client').options[document.getElementById('client').selectedIndex].text,
+            employee: document.getElementById('employee').value,
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value,
+            services: document.getElementById('services').value,
+            frequency: document.getElementById('frequency').value,
+            goals: Array.from(document.getElementById('goals').selectedOptions).map(opt => opt.value),
+            otherTasks: document.getElementById('otherTasks').value,
+            remarks: document.getElementById('remarks').value,
+            procedures: document.getElementById('procedures').value
+        };
+
+        try {
+            const response = await fetch('/save-care-plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert('Care Plan saved successfully!');
+                form.reset();
+            } else {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.message}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to save Care Plan');
+        }
+    });
+});
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Billityo Timesheet</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="timesheet-header">
+            <h1>Manual Timesheet Entry</h1>
+            <div class="payment-type">
+                <input type="radio" id="insurance-pay" name="pay-type" checked>
+                <label for="insurance-pay">Insurance Pay</label>
+                <input type="radio" id="private-pay" name="pay-type">
+                <label for="private-pay">Private Pay</label>
+            </div>
+        </div>
+
+        <div class="search-filters">
+            <select id="client-select">
+                <option>Select Client</option>
+                <option>ALI, UMULKHAIR A</option>
+                <option>ABDI, ABDULAHI A</option>
+                <option>KHAMIS, RUKIA A</option>
+                <option>MOORE, JA'ZIA M</option>
+            </select>
+            <select id="employee-select">
+                <option>Select Employee</option>
+                <option>Ali, Khadra Abdi</option>
+                <option>AHMED, NAJMO MAHAD</option>
+                <option>Salah, Suda Omar</option>
+                <option>Matthews, Benjamin Jarmel</option>
+            </select>
+            <input type="checkbox" id="show-all"> Show All
+            <div class="date-range">
+                <input type="date" id="start-date" value="2025-03-17">
+                <input type="date" id="end-date" value="2025-03-27">
+                <button id="search-btn">Search</button>
+            </div>
+        </div>
+
+        <div class="timesheet-stats">
+            <span>Total Hours: <span id="total-hours">154.25</span></span>
+            <button id="generate-timesheet">Generate Timesheet</button>
+            <button id="upload-timesheet">Upload Timesheet</button>
+        </div>
+
+        <table id="timesheet-table">
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Employee</th>
+                    <th>Service Code</th>
+                    <th>From Date</th>
+                    <th>To Date</th>
+                    <th>Worked Hours</th>
+                </tr>
+            </thead>
+            <tbody id="timesheet-body">
+                <tr>
+                    <td>ALI, UMULKHAIR A</td>
+                    <td>Ali, Khadra Abdi</td>
+                    <td>T1019</td>
+                    <td>03/20/2025 04:00 PM</td>
+                    <td>03/27/2025 08:45 PM</td>
+                    <td>38.00</td>
+                </tr>
+                <tr>
+                    <td>ABDI, ABDULAHI A</td>
+                    <td>AHMED, NAJMO MAHAD</td>
+                    <td>T1019</td>
+                    <td>03/19/2025 03:00 PM</td>
+                    <td>03/27/2025 08:15 PM</td>
+                    <td>47.25</td>
+                </tr>
+                <tr>
+                    <td>KHAMIS, RUKIA A</td>
+                    <td>Salah, Suda Omar</td>
+                    <td>T1019</td>
+                    <td>03/25/2025 08:30 AM</td>
+                    <td>03/27/2025 06:30 PM</td>
+                    <td>30.00</td>
+                </tr>
+                <tr>
+                    <td>MOORE, JA'ZIA M</td>
+                    <td>Matthews, Benjamin Jarmel</td>
+                    <td>T1019</td>
+                    <td>03/27/2025 04:00 PM</td>
+                    <td>03/27/2025 07:00 PM</td>
+                    <td>3.00</td>
+                </tr>
+                <tr>
+                    <td>ALAMIR, abdulrahman</td>
+                    <td>ALAMIR, LAMA YOUSEF</td>
+                    <td>T1019</td>
+                    <td>03/26/2025 04:00 PM</td>
+                    <td>03/27/2025 08:45 PM</td>
+                    <td>9.50</td>
+                </tr>
+                <tr>
+                    <td>HASSAM, MUNA A</td>
+                    <td>Abdi, Qadra Hirsi</td>
+                    <td>T1019</td>
+                    <td>03/20/2025 05:00 PM</td>
+                    <td>03/27/2025 09:30 PM</td>
+                    <td>36.00</td>
+                </tr>
+                <tr>
+                    <td>MOHAMED, MUNA M</td>
+                    <td>MOHAMED, AHMED MOHAMUD</td>
+                    <td>H2014</td>
+                    <td>03/26/2025 04:00 PM</td>
+                    <td>03/27/2025 08:00 PM</td>
+                    <td>8.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.container {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.timesheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.timesheet-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+select, input[type="date"] {
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+</style>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const searchBtn = document.getElementById('search-btn');
+    const clientSelect = document.getElementById('client-select');
+    const employeeSelect = document.getElementById('employee-select');
+    const startDate = document.getElementById('start-date');
+    const endDate = document.getElementById('end-date');
+    const totalHoursSpan = document.getElementById('total-hours');
+    const timesheetBody = document.getElementById('timesheet-body');
+
+    // Full dataset matching the screenshot
+    const fullDataset = [
+        {
+            client: 'ALI, UMULKHAIR A',
+            employee: 'Ali, Khadra Abdi',
+            serviceCode: 'T1019',
+            fromDate: '03/20/2025 04:00 PM',
+            toDate: '03/27/2025 08:45 PM',
+            workedHours: 38.00
+        },
+        {
+            client: 'ABDI, ABDULAHI A',
+            employee: 'AHMED, NAJMO MAHAD',
+            serviceCode: 'T1019',
+            fromDate: '03/19/2025 03:00 PM',
+            toDate: '03/27/2025 08:15 PM',
+            workedHours: 47.25
+        },
+        {
+            client: 'KHAMIS, RUKIA A',
+            employee: 'Salah, Suda Omar',
+            serviceCode: 'T1019',
+            fromDate: '03/25/2025 08:30 AM',
+            toDate: '03/27/2025 06:30 PM',
+            workedHours: 30.00
+        },
+        {
+            client: 'MOORE, JA\'ZIA M',
+            employee: 'Matthews, Benjamin Jarmel',
+            serviceCode: 'T1019',
+            fromDate: '03/27/2025 04:00 PM',
+            toDate: '03/27/2025 07:00 PM',
+            workedHours: 3.00
+        },
+        {
+            client: 'ALAMIR, abdulrahman',
+            employee: 'ALAMIR, LAMA YOUSEF',
+            serviceCode: 'T1019',
+            fromDate: '03/26/2025 04:00 PM',
+            toDate: '03/27/2025 08:45 PM',
+            workedHours: 9.50
+        },
+        {
+            client: 'HASSAM, MUNA A',
+            employee: 'Abdi, Qadra Hirsi',
+            serviceCode: 'T1019',
+            fromDate: '03/20/2025 05:00 PM',
+            toDate: '03/27/2025 09:30 PM',
+            workedHours: 36.00
+        },
+        {
+            client: 'MOHAMED, MUNA M',
+            employee: 'MOHAMED, AHMED MOHAMUD',
+            serviceCode: 'H2014',
+            fromDate: '03/26/2025 04:00 PM',
+            toDate: '03/27/2025 08:00 PM',
+            workedHours: 8.00
+        }
+    ];
+
+    function renderTable(data) {
+        timesheetBody.innerHTML = ''; // Clear existing rows
+        
+        // Calculate total hours
+        const totalHours = data.reduce((sum, row) => sum + row.workedHours, 0);
+        totalHoursSpan.textContent = totalHours.toFixed(2);
+
+        // Render rows
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.client}</td>
+                <td>${row.employee}</td>
+                <td>${row.serviceCode}</td>
+                <td>${row.fromDate}</td>
+                <td>${row.toDate}</td>
+                <td>${row.workedHours}</td>
+            `;
+            timesheetBody.appendChild(tr);
+        });
+    }
+
+    // Initial render
+    renderTable(fullDataset);
+
+    searchBtn.addEventListener('click', () => {
+        const clientFilter = clientSelect.value;
+        const employeeFilter = employeeSelect.value;
+
+        // Filter logic
+        const filteredData = fullDataset.filter(row => {
+            const clientMatch = clientFilter === 'Select Client' || row.client === clientFilter;
+            const employeeMatch = employeeFilter === 'Select Employee' || row.employee === employeeFilter;
+            return clientMatch && employeeMatch;
+        });
+
+        renderTable(filteredData);
+    });
+});
+</script>
+    <script src="timesheet.js"></script>
+</body>
+</html>

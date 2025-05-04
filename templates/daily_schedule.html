@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Schedule Review</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-light: #dbeafe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --border-radius: 0.5rem;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: var(--gray-700);
+            line-height: 1.5;
+        }
+
+        .breadcrumb {
+            background-color: #e9ecef;
+            padding: 0.75rem 1rem;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+
+        .breadcrumb-item a {
+            color: var(--gray-600);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--gray-800);
+        }
+
+        .page-container {
+            padding: 1.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .date-display {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .filters-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+            color: var(--gray-700);
+        }
+
+        .form-control, .form-select {
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-300);
+            padding: 0.5rem 0.75rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+        }
+
+        .form-date {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .form-date .form-control {
+            flex: 1;
+        }
+
+        .form-date .btn {
+            padding: 0.5rem;
+        }
+
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .in-progress {
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .completed {
+            color: var(--success);
+            background-color: var(--success-light);
+        }
+
+        .late {
+            color: var(--warning);
+            background-color: var(--warning-light);
+        }
+
+        .missed {
+            color: var(--danger);
+            background-color: var(--danger-light);
+        }
+
+        .table-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .search-input {
+            width: 180px;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead th {
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            position: relative;
+        }
+
+        tbody td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        tbody tr:hover {
+            background-color: var(--gray-100);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sort-icon {
+            display: inline-flex;
+            flex-direction: column;
+            margin-left: 0.25rem;
+            vertical-align: middle;
+        }
+
+        .sort-icon i {
+            line-height: 0.5;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+
+        .sort-icon i.active {
+            color: var(--primary);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-yes {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .status-no {
+            background-color: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 0.25rem;
+        }
+
+        .page-item .page-link {
+            border: 1px solid var(--gray-300);
+            padding: 0.375rem 0.75rem;
+            color: var(--primary);
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-item .page-link:hover {
+            background-color: var(--gray-100);
+        }
+
+        .page-item.disabled .page-link {
+            color: var(--gray-400);
+            pointer-events: none;
+            background-color: var(--gray-100);
+            border-color: var(--gray-300);
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .filters-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filter-item {
+                width: 100%;
+            }
+
+            .stats-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stat-card {
+                min-width: 0;
+            }
+
+            .table-controls {
+                flex-direction: column;
+            }
+
+            .search-row {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb" class="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="#">Scheduling</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Daily Schedule Review</li>
+        </ol>
+    </nav>
+
+    <div class="page-container">
+        <!-- Page header with date and action buttons -->
+        <div class="page-header">
+            <h1 class="date-display">
+                <i class="far fa-calendar-alt me-2"></i>
+                04/11/2025
+            </h1>
+            <div class="action-buttons">
+                <button class="btn btn-outline-primary">
+                    <i class="far fa-calendar-check"></i>
+                    <span>All Schedule</span>
+                </button>
+                <button class="btn btn-outline-primary">
+                    <i class="far fa-file-alt"></i>
+                    <span>EVV Compliance Report</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters section -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-item">
+                    <label for="employeeSelect" class="filter-label">Employee</label>
+                    <select id="employeeSelect" class="form-select">
+                        <option value="">Select Employee</option>
+                        <option value="1">ABDI KHALID</option>
+                        <option value="2">ABDI NASRO</option>
+                        <option value="3">Abdi Qadra</option>
+                        <option value="4">ABDI SHUKRI</option>
+                        <option value="5">Abdi Yasmin</option>
+                        <option value="6">ADEN FADHIYA</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="clientSelect" class="filter-label">Clients</label>
+                    <select id="clientSelect" class="form-select">
+                        <option value="">Select Client</option>
+                        <option value="1">Abdi Ahmed</option>
+                        <option value="2">ABDI ABDINAJIB</option>
+                        <option value="3">HASSAM MUNA</option>
+                        <option value="4">ABDI SALMAN</option>
+                        <option value="5">HAJI MAHAD</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="statusSelect" class="filter-label">Status</label>
+                    <select id="statusSelect" class="form-select">
+                        <option value="">Select Status</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="late">Late</option>
+                        <option value="missed">Missed</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="scheduleDate" class="filter-label">Schedule Date</label>
+                    <div class="form-date">
+                        <input type="text" id="scheduleDate" class="form-control" value="04/11/2025">
+                        <button class="btn btn-outline-secondary">
+                            <i class="far fa-calendar-alt"></i>
+                        </button>
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics cards -->
+        <div class="stats-container">
+            <div class="stat-card in-progress">
+                <div class="stat-number">0</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card late">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Late</div>
+            </div>
+            <div class="stat-card missed">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Missed</div>
+            </div>
+        </div>
+
+        <!-- Table section -->
+        <div class="table-container">
+            <div class="table-controls">
+                <div class="action-buttons">
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-download"></i>
+                        <span>Export</span>
+                    </button>
+                    <button class="btn btn-outline-primary">
+                        <i class="fas fa-print"></i>
+                        <span>Print</span>
+                    </button>
+                </div>
+                <div class="search-row">
+                    <input type="text" class="search-input" placeholder="Employee Name">
+                    <input type="text" class="search-input" placeholder="Client Name">
+                    <input type="text" class="search-input" placeholder="Scheduled Date">
+                    <input type="text" class="search-input" placeholder="Worked Date">
+                    <input type="text" class="search-input" placeholder="Procedure Code">
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Employee Name
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up active"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Client Name
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Scheduled Date
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Worked Date
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Procedure Code
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Employee Signature
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Client Signature
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Clock In
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Clock Out
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                EVV Schedule
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                EVV Status
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                            <th>
+                                Live In
+                                <span class="sort-icon">
+                                    <i class="fas fa-caret-up"></i>
+                                    <i class="fas fa-caret-down"></i>
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ABDI KHALID</td>
+                            <td>Abdi Ahmed</td>
+                            <td>04/11/2025 04:00 PM - 09:15 PM</td>
+                            <td></td>
+                            <td>T1019</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td>-</td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                        </tr>
+                        <tr>
+                            <td>ABDI NASRO</td>
+                            <td>ABDI ABDINAJIB</td>
+                            <td>04/11/2025 12:00 PM - 06:15 PM</td>
+                            <td></td>
+                            <td>T1019</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                            <td>-</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                        </tr>
+                        <tr>
+                            <td>Abdi Qadra</td>
+                            <td>HASSAM MUNA</td>
+                            <td>04/11/2025 05:00 PM - 09:30 PM</td>
+                            <td></td>
+                            <td>T1019</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                            <td>-</td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                        </tr>
+                        <tr>
+                            <td>ABDI SHUKRI</td>
+                            <td>ABDI SALMAN</td>
+                            <td>04/11/2025 03:00 PM - 08:15 PM</td>
+                            <td></td>
+                            <td>T1019</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                            <td>-</td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                        </tr>
+                        <tr>
+                            <td>Abdi Yasmin</td>
+                            <td>HAJI MAHAD</td>
+                            <td>04/11/2025 11:00 PM - 04/12/2025 05:00 AM</td>
+                            <td></td>
+                            <td>S5135 - UA</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                            <td>-</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                        </tr>
+                        <tr>
+                            <td>ADEN FADHIYA</td>
+                            <td>HAJI MAHAD</td>
+                            <td>04/11/2025 05:00 AM - 08:30 AM</td>
+                            <td></td>
+                            <td>T1019</td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td></td>
+                            <td></td>
+                            <td><span class="status-badge status-no">No</span></td>
+                            <td>-</td>
+                            <td><span class="status-badge status-yes">Yes</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-container">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Add click event for sort icons
+            $('.sort-icon i').click(function() {
+                // Remove active class from all sort icons
+                $('.sort-icon i').removeClass('active');
+                // Add active class to clicked icon
+                $(this).addClass('active');
+            });
+
+            // Initialize status counts (these would come from backend data)
+            const inProgressCount = 0;
+            const completedCount = 0;
+            const lateCount = 0;
+            const missedCount = 3;
+
+            // Filter functionality
+            $('#employeeSelect, #clientSelect, #statusSelect').change(function() {
+                // In a real app, this would trigger filtering
+                console.log('Filter changed, would refresh data');
+            });
+
+            // Date change handling
+            $('#scheduleDate').change(function() {
+                // In a real app, this would load data for the selected date
+                console.log('Date changed to:', $(this).val());
+            });
+
+            // Search functionality
+            $('.search-input').on('input', function() {
+                // In a real app, this would filter the table based on search input
+                console.log('Searching for:', $(this).val());
+            });
+        });
+    </script>
+</body>
+</html>
